@@ -10,3 +10,8 @@ git clone https://github.com/VeterChul/DnD
 
 Дальше запустите файл n_kyb.py.
 Желаю вам приятной игры.
+
+Если найдутся какие-то неисправности пишите на 
+```
+https://t.me/Veter_Chulinin
+```
