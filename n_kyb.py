@@ -1,6 +1,6 @@
 ﻿import re
 import random as r
-from all_text import start_mess, error_mess, list_help, ref
+from all_text import start_mess, error_mess, list_help, ref, list_exa
 
 list_mode = ["s", "b", "r"]
 
@@ -14,8 +14,8 @@ list_def = {
     'cls' :  (lambda mas : print("\n"*50)), 
     'help' : (lambda mas : print_help(mas)),
     'ref' :  (lambda mas : print_ref()),
-    'mode' : (lambda mas : svipe_mode(mas[0])),
-    'again' : (lambda mas : throw_again()),
+    'mode' : (lambda mas : svipe_mode(mas)),
+    'again' : (lambda mas : throw_again(mas)),
     'saved' : (lambda mas : print_saved(mas)),
     'save' : (lambda mas : new_cub(mas)),
     '' : (lambda mas : __again(mas)),
@@ -45,38 +45,51 @@ def kyb(k, ch = 1, chit = False):
                 n = r.randint(1, k)
             if k == 100:
                     n -= 1        
-            print("Ваше число:", n) 
+            print(f"С куба k{k} выпало:", n) 
             old_s = (ch, k)
     return 0
 
 def svipe_mode(mas):#сменить мод
     global mode, list_mode, error_mess
     try:
+        if len(mas) == 1:
+            mode = 0
+            return 0
         mode = list_mode.index(mas[0])
+        print(f"Мод сменён на {list_mode[mode]}")
     except:
         print(error_mess, "Ошибка изменения мода. Проверьте првильность ввода.\nНапишите ref для получения справки.")
 
 def print_saved(mas):#Вывод сохраненных кубов
     global list_cub
-    if len(mas) == 1:
-        mas = [0, len(list_cub) - 1]
-    print("У вас есть сохранёные кубы:")
-    for i in range(mas[0]-1, mas[1]):
-        print(f"    {i}:{list_cub[i][0]}k{list_cub[i][1]}")
+    try:
+        if len(mas) == 1:
+            mas = [1, len(list_cub)]
+        if mas[0] < 1:
+            mas[0] = 1
+        if mas[1] > len(list_cub):
+            mas[1] = len(list_cub)
+        print("У вас есть сохранёные кубы:")
+        for i in range(int(mas[0]) - 1, int(mas[1])):
+            print(f"    {i + 1} : {list_cub[i][0]}k{list_cub[i][1]}")
+    except:
+        print(error_mess, "Ошибка вывода кубов. Проверьте првильность ввода.\nНапишите ref для получения справки.")
 
 def new_cub(mas):#создать новый куб
     global list_cub
-    
-    if re.search("[0-9]*[dkк][0-9]+", mas[0]):
-        list_cub.append(open_ky(mas[0]))
-        print(f"Записан новый куб под номером {len(list_cub)}. Значение {list_cub[-1][1]}k{list_cub[-1][1]}")
-        return 0
-    if int(mas[0]) - 1 < len(list_cub):
-        list_cub[int(mas[0]) - 1] = open_ky(mas[1])
-        print(f"Куб номер {mas[0]} перезаписан. Новое значение {list_cub[int(mas[0]) - 1][1]}k{list_cub[int(mas[0]) - 1][1]}")
-    else:
-        list_cub.append(open_ky(mas[1]))
-        print(f"Записан новый куб под номером {len(list_cub)}. Значение {list_cub[-1][1]}k{list_cub[-1][1]}")
+    try:
+        if re.search("[0-9]*[dkк][0-9]+", mas[0]):
+            list_cub.append(open_ky(mas[0]))
+            print(f"Записан новый куб под номером {len(list_cub)}. Значение {list_cub[-1][0]}k{list_cub[-1][1]}")
+            return 0
+        if int(mas[0]) - 1 < len(list_cub):
+            list_cub[int(mas[0]) - 1] = open_ky(mas[1])
+            print(f"Куб номер {mas[0]} перезаписан. Новое значение {list_cub[int(mas[0]) - 1][0]}k{list_cub[int(mas[0]) - 1][1]}")
+        else:
+            list_cub.append(open_ky(mas[1]))
+            print(f"Записан новый куб под номером {len(list_cub)}. Значение {list_cub[-1][0]}k{list_cub[-1][1]}")
+    except:
+        print(error_mess, "Ошибка при создании куба. Проверьте првильность ввода.\nНапишите ref для получения справки.")
 
 def __again(mas):#ентер
     global mode, old_s
@@ -86,24 +99,35 @@ def __again(mas):#ентер
         kyb(old_s[1], old_s[0], mas[-1])
 
 def throw(mas):#кинуть сохраненый куб
-    global mode, list_cub, old_s
-    kybb = list_cub[mas[0]]
-    old_s = (kybb[0], kybb[1])
-    kyb(kybb[1], kybb[0], mass[-1])
+    try:
+        global mode, list_cub, old_s
+        kybb = list_cub[int(mas[0]) - 1]
+        kyb(kybb[1], kybb[0], mas[-1])
+    except:
+        print(error_mess, "Ошибка при броске сохраненного куба. Проверьте првильность ввода.\nНапишите ref для получения справки.")
 
 def throw_again(mas):#перекинуть последний куб
-    global old_s
-    kyb(old_s[1], old_s[0], mas[-1])
+    try:
+        global old_s
+        if old_s[0] == 0:
+            print("Вы ещё не кидали кубов")
+            return 0
+        kyb(old_s[1], old_s[0], mas[-1])
+    except:
+        print(error_mess, "Ошибка при броске прошлого куба. Проверьте првильность ввода.\nНапишите ref для получения справки.")
 
 def print_help(mas):#Вывод help
-    global list_mode, mode, list_help
-    if len(mas) == 1:
-        h = f"Вы находитесь в режиме {list_mode[mode]}.\nДля получения справки пропишите 'ref'"
-        print(h)
-        return 0
-    else:
-        print(f"{mas[0]} - {list_help[mas[0]]}.")
-        return 0
+    try:
+        global list_mode, mode, list_help
+        if len(mas) == 1:
+            h = f"Вы находитесь в режиме {list_mode[mode]}.\nДля получения справки пропишите 'ref'"
+            print(h)
+            return 0
+        else:
+            print(f"{mas[0]} - {list_help[mas[0]]}.\nПример:\n{list_exa[mas[0]]}")
+            return 0
+    except:
+        print(error_mess, "Ошибка при выводе help. Проверьте првильность ввода.\nНапишите ref для получения справки.")
 
 def print_ref():#Вывод справки
     global list_mode, mode, ref
@@ -111,8 +135,16 @@ def print_ref():#Вывод справки
     return 0
 
 def open_ky(ky):
-    m = ky.split("k")
-    return [int(m[0]), int(m[1])]
+    try:
+        if "k" in ky:
+            m = ky.split("k")
+        if "d" in ky:
+            m = ky.split("d")
+        if "к" in ky:
+            m = ky.split("к")
+        return [int(m[0]), int(m[1])]
+    except:
+        print(error_mess, "Ошибка при разделение кубов. Проверьте првильность ввода.\nНапишите ref для получения справки.")
 
 print(start_mess)
 
